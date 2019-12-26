@@ -3,6 +3,7 @@ import 'package:fame/views/itemscreen.dart';
 import 'package:fame/model/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fame/model/task.dart';
+import 'package:intl/intl.dart';
 
 class TaskScreen extends StatefulWidget {
   @override
@@ -22,14 +23,34 @@ class TaskScreenState extends State<TaskScreen> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: new AppBar(title: new Text('Todo List')),
-      body: _buildTodoTasksList(),
-      floatingActionButton: new FloatingActionButton(
-          onPressed:
-              _pushAddTaskScreen, // pressing this button now opens the new screen
-          tooltip: 'Add task',
-          child: new Icon(Icons.add)),
-    );
+        appBar: new AppBar(title: new Text('Todo List')),
+        body: new Card(
+            child: Column(
+          children: <Widget>[
+            Container(
+              margin: EdgeInsets.only(top: 22.0),
+              child: Text(
+                
+                 currentDay(context).toString()+', '+currentDate(context)+' '+currentMonth(context),
+                style: Theme.of(context)
+                    .textTheme
+                    .headline
+                    .copyWith(color: Colors.black),
+              ),
+            ),
+            Expanded(
+              child: SizedBox(
+                height: 200.0,
+                child: _buildTodoTasksList(),
+              ),
+            )
+          ],
+        )),
+        floatingActionButton: new FloatingActionButton(
+            onPressed:
+                _pushAddTaskScreen, // pressing this button now opens the new screen
+            tooltip: 'Add task',
+            child: new Icon(Icons.add)));
   }
 
   void _pushAddTaskScreen() {
@@ -80,21 +101,20 @@ class TaskScreenState extends State<TaskScreen> {
                       child: new Container(
                     padding: EdgeInsets.only(left: 22.0, right: 22.0),
                     child: ListTile(
-                      onTap: () =>Navigator.push(
+                      onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
                                   ItemScreen(displayedItem.name))),
                       contentPadding:
                           EdgeInsets.symmetric(horizontal: 0, vertical: 8.0),
-                      
                       trailing: IconButton(
                         icon: Icon(Icons.delete_outline),
                         onPressed: () => _removeList(displayedItem),
-                      ),title: new Text(displayedItem.name),
+                      ),
+                      title: new Text(displayedItem.name),
                     ),
                   ));
-                  
                 }
                 return null;
               },
@@ -102,7 +122,35 @@ class TaskScreenState extends State<TaskScreen> {
           }
         });
   }
-  void _removeList(Task displayedItem){
-  _taskBloc.dispatch(DeleteTask(displayedItem));
+
+  void _removeList(Task displayedItem) {
+    _taskBloc.dispatch(DeleteTask(displayedItem));
+  }
+
+  String currentDay(BuildContext context) {
+    return DateTimeUtils.currentDay;
+  }
+  String currentDate(BuildContext context) {
+    return DateTimeUtils.currentDate;
+  }
+  String currentMonth(BuildContext context) {
+    return DateTimeUtils.currentMonth;
+  }
 }
+
+class DateTimeUtils {
+  static String get currentDay {
+    DateTime now = DateTime.now();
+    return DateFormat('EEEE').format(now);
+  }
+
+  static String get currentMonth {
+    DateTime now = DateTime.now();
+    return DateFormat('MMM').format(now);
+  }
+
+  static String get currentDate {
+    DateTime now = DateTime.now();
+    return DateFormat('d').format(now);
+  }
 }
